@@ -5,6 +5,7 @@ import matplotlib
 from matplotlib import pyplot as plt
 from PIL import ImageTk,Image
 from tkcalendar import DateEntry
+from datetime import datetime
 
 class FinanceTracker:
     def __init__(self,root):
@@ -18,7 +19,7 @@ class FinanceTracker:
         self.cursor=self.database.cursor()
         self.cursor.execute('''
           CREATE TABLE IF NOT EXISTS expenses(
-            id SERIAL PRIMARY KEY,
+            id SERIAL PRIMARY KEY,                            
             amount REAL,
             category TEXT,
             expense_date DATE
@@ -37,11 +38,13 @@ class FinanceTracker:
         # create a new record button
         self.button = tk.Button(self.start_frame, text='New record',  bg='sky blue', fg='black', font=('arial', 14), relief=tk.RAISED,command=self.get_dashboard)
         self.button.place(relx=0.5, rely=0.5, anchor=tk.CENTER)  # Position at the center
-        
+        self.dashboard_frame=tk.Frame(self.root)
+        self.visualize_frame=tk.Frame(self.root)
     
     def get_dashboard(self):
         #Destroy an existing start frame
         self.start_frame.destroy()
+        self.visualize_frame.destroy()
         #create a new frame
         self.dashboard_frame=tk.Frame(self.root,bg='teal')
         self.dashboard_frame.pack(fill='both',expand=1)
@@ -77,23 +80,57 @@ class FinanceTracker:
         self.visualize_button.place(relx=0.5,rely=0.4, anchor=tk.CENTER)
 
         #buttton to exit
-        self.exit_button=tk.Button(self.dashboard_frame,text="Exit",bg='sky blue',fg='Yellow',command=self.root.quit)
+        self.exit_button=tk.Button(self.dashboard_frame,text="Exit",bg='sky blue',fg='Yellow',command=self.exit_app)
         self.exit_button.place(relx=0.7,rely=0.4, anchor=tk.CENTER)
 
     def add_expense(self):
+        #get the inputs
         category=self.category.get()
         amount=self.amount_entry.get()
         date=self.date_entry.get()
+
+        #sql command
         sql="INSERT INTO expenses (amount, category, expense_date) VALUES (%s, %s, %s)"
         data=(amount,category,date)
+
+        #insert into database
         self.cursor.execute(sql,data)
         self.database.commit()
+        
+        #clear the amount field
         self.amount_entry.delete(0, tk.END)
 
-
+    def exit_app(self):
+        self.root.destroy()
+        self.database.close()
+        self.root.quit()
 
     def visualize(self):
-        ...
+        #destroy the dashboard frame
+        self.dashboard_frame.destroy()
+        self.visualize_frame=tk.Frame(self.root,bg='teal')
+        self.visualize_frame.pack(fill='both',expand=1)
+        #create a sql command
+        
+        current_month=str(datetime.now().month)
+        self.category_expenses=[]
+        for category in self.categories:
+            sql=f"SELECT SUM(amount) FROM expenses WHERE category='{category}' AND EXTRACT(MONTH FROM expense_date)={current_month}"
+            self.cursor.execute(sql)
+            expenses=self.cursor.fetchone()[0]
+            self.category_expenses.append(expenses)
+        print(self.category_expenses)
+        
+        
+        plt.pie(self.category_expenses,labels=self.categories,autopct='%1.1f%%',startangle=90)
+        plt.savefig("my_pie_chart.png")
+        plt.close()
+        self.my_image=ImageTk.PhotoImage(Image.open('my_pie_chart.png'))
+        self.image_label=tk.Label(self.visualize_frame,image=self.my_image)
+        self.image_label.pack(padx=10,pady=10)
+        self.back_button=tk.Button(self.visualize_frame,text="Go Back",command=self.get_dashboard)
+        self.back_button.pack(padx=10,pady=10)
+        
 def main():
     root=tk.Tk()
     finance_tracker=FinanceTracker(root)
