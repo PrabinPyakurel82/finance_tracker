@@ -22,7 +22,8 @@ class FinanceTracker:
             id SERIAL PRIMARY KEY,                            
             amount REAL,
             category TEXT,
-            expense_date DATE
+            expense_date DATE,
+            remarks TEXT
           )
         ''')
         self.database.commit()
@@ -49,49 +50,57 @@ class FinanceTracker:
         self.dashboard_frame=tk.Frame(self.root,bg='teal')
         self.dashboard_frame.pack(fill='both',expand=1)
         #list of categories
-        self.categories=['food','shopping','education']
+        self.categories=['Food','Rent','Education','Travel','Miscellneous','Taxes','Health and Medicine']
         #label for category
-        self.select_category=tk.Label(self.dashboard_frame,text='Select a category',bg='teal',fg='yellow',font=('Arial',12))
+        self.select_category=tk.Label(self.dashboard_frame,text='Select a category:',bg='teal',fg='yellow',font=('Arial',12))
         self.select_category.pack(padx=10,pady=10)
         #combobox for category
-        self.category=ttk.Combobox(self.dashboard_frame, values=self.categories,font=('Arial',12))
+        self.category=ttk.Combobox(self.dashboard_frame, values=self.categories,font=('Arial',10))
         self.category.current(0)
         self.category.pack(padx=10,pady=10)
+
+        #label for remarks
+        self.remarks_label=tk.Label(self.dashboard_frame,text='Remarks:',bg='teal',fg='yellow',font=("Arial",12))
+        self.remarks_label.pack(padx=10,pady=10)
+        self.remarks=tk.Entry(self.dashboard_frame,width=25)
+        self.remarks.pack(padx=10,pady=10)
 
         #entry box for amount
         self.amount_label=tk.Label(self.dashboard_frame, text='Amount',bg='teal',fg='yellow',font=('Arial',12))
         self.amount_label.pack(pady=10, padx=10)
         self.amount_entry=tk.Entry(self.dashboard_frame,width=25)
         self.amount_entry.pack(padx=10,pady=10)
-        
-        self.date_label = tk.Label(self.dashboard_frame, text='Select Date:', font=("Arial", 12), bg='teal', fg='yellow')
-        self.date_label.pack(padx=10,pady=10)
 
         # Create a DateEntry widget
+        self.date_label = tk.Label(self.dashboard_frame, text='Select Date:', font=("Arial", 12), bg='teal', fg='yellow')
+        self.date_label.pack(padx=10,pady=10)
         self.date_entry=DateEntry(self.dashboard_frame,width=25, background='sky blue', foreground='black', borderwidth=2)
         self.date_entry.pack(pady=10,padx=10)
         
         #button to add expense
         self.add_expense_button=tk.Button(self.dashboard_frame,text="Add",bg='sky blue',fg='Yellow',command=self.add_expense)
-        self.add_expense_button.place(relx=0.3,rely=0.4, anchor=tk.CENTER)
+        self.add_expense_button.place(relx=0.3,rely=0.53, anchor=tk.CENTER)
     
         #button to visualize
         self.visualize_button=tk.Button(self.dashboard_frame,text="Visualize",bg='sky blue',fg='Yellow',command=self.visualize)
-        self.visualize_button.place(relx=0.5,rely=0.4, anchor=tk.CENTER)
+        self.visualize_button.place(relx=0.5,rely=0.53, anchor=tk.CENTER)
 
         #buttton to exit
         self.exit_button=tk.Button(self.dashboard_frame,text="Exit",bg='sky blue',fg='Yellow',command=self.exit_app)
-        self.exit_button.place(relx=0.7,rely=0.4, anchor=tk.CENTER)
+        self.exit_button.place(relx=0.7,rely=0.53, anchor=tk.CENTER)
+
+        self.show_recent_expenses()
 
     def add_expense(self):
         #get the inputs
         category=self.category.get()
         amount=self.amount_entry.get()
         date=self.date_entry.get()
-
+        remarks=self.remarks.get()
+        
         #sql command
-        sql="INSERT INTO expenses (amount, category, expense_date) VALUES (%s, %s, %s)"
-        data=(amount,category,date)
+        sql="INSERT INTO expenses (amount, category, expense_date,remarks) VALUES (%s, %s, %s,%s)"
+        data=(amount,category,date,remarks)
 
         #insert into database
         self.cursor.execute(sql,data)
@@ -99,6 +108,33 @@ class FinanceTracker:
         
         #clear the amount field
         self.amount_entry.delete(0, tk.END)
+        self.show_recent_expenses()
+
+    def show_recent_expenses(self):
+        sql="SELECT * FROM expenses WHERE expense_date=CURRENT_DATE"
+        self.cursor.execute(sql)
+        self.today_expenses=self.cursor.fetchall()
+        if len(self.today_expenses)!=0:
+            self.list_label=tk.Label(self.dashboard_frame,text="Today's Expenses:",bg='teal',fg='yellow')
+            self.list_label.place(relx=0.15,rely=0.6)
+            self.expenses_listbox=tk.Listbox(self.dashboard_frame,width=60,height=5)
+            self.expenses_listbox.place(relx=0.2,rely=0.65)
+            for expense in self.today_expenses:
+              expense_info = f"Amount: {expense[1]}, Category: {expense[2]}, Remarks: {expense[4]}"
+              frame = tk.Frame(self.expenses_listbox)
+              frame.pack(fill='x')
+              label = tk.Label(frame, text=expense_info)
+              label.pack(side='left')
+              undo_button = tk.Button(frame, text="Undo",command=lambda: self.delete_expenses(expense[0]))
+              undo_button.pack(side='right')
+
+    def delete_expenses(self,id):
+        self.dashboard_frame.destroy()
+        sql=f'DELETE FROM expenses WHERE id={id}'
+        self.cursor.execute(sql)
+        self.database.commit()
+        self.get_dashboard()
+        self.visualize_frame.destroy()
 
     def exit_app(self):
         self.root.destroy()
@@ -114,20 +150,34 @@ class FinanceTracker:
         
         current_month=str(datetime.now().month)
         self.category_expenses=[]
+        self.category_labels=[]
+       
         for category in self.categories:
             sql=f"SELECT SUM(amount) FROM expenses WHERE category='{category}' AND EXTRACT(MONTH FROM expense_date)={current_month}"
             self.cursor.execute(sql)
             expenses=self.cursor.fetchone()[0]
-            self.category_expenses.append(expenses)
-        print(self.category_expenses)
+            if expenses:
+               self.category_expenses.append(expenses)
+               self.category_labels.append(category)
+            #else:
+                #self.category_expenses.append(0)
+            
+    
         
-        
-        plt.pie(self.category_expenses,labels=self.categories,autopct='%1.1f%%',startangle=90)
-        plt.savefig("my_pie_chart.png")
-        plt.close()
-        self.my_image=ImageTk.PhotoImage(Image.open('my_pie_chart.png'))
-        self.image_label=tk.Label(self.visualize_frame,image=self.my_image)
-        self.image_label.pack(padx=10,pady=10)
+        try:
+          plt.pie(self.category_expenses,labels=None, autopct='%1.1f%%',startangle=90)
+          plt.legend(self.category_labels, loc='right', bbox_to_anchor=(1.35, 0.05))
+          plt.savefig("my_pie_chart.png")
+          plt.close()
+          self.my_image=ImageTk.PhotoImage(Image.open('my_pie_chart.png'))
+          self.image_label=tk.Label(self.visualize_frame,image=self.my_image)
+          self.image_label.pack(padx=10,pady=10)
+
+        except:
+            self.error_label=tk.Label(self.visualize_frame,text="NOT ENOUGH RECORD TO VISUALIZE",bg='teal',font=('Arial',12))
+            self.error_label.pack()
+            print()
+
         self.back_button=tk.Button(self.visualize_frame,text="Go Back",command=self.get_dashboard)
         self.back_button.pack(padx=10,pady=10)
         
