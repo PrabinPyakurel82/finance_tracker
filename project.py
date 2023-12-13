@@ -161,14 +161,14 @@ class FinanceTracker:
                self.category_labels.append(category)
             #else:
                 #self.category_expenses.append(0)
-            
-    
         
         try:
           plt.pie(self.category_expenses,labels=None, autopct='%1.1f%%',startangle=90)
           plt.legend(self.category_labels, loc='right', bbox_to_anchor=(1.35, 0.05))
           plt.savefig("my_pie_chart.png")
           plt.close()
+          self.image_label=tk.Label(self.visualize_frame,text="Pie-Chart for this month",bg='teal',fg='yellow',font=("Arial",12))
+          self.image_label.pack(padx=10,pady=10)
           self.my_image=ImageTk.PhotoImage(Image.open('my_pie_chart.png'))
           self.image_label=tk.Label(self.visualize_frame,image=self.my_image)
           self.image_label.pack(padx=10,pady=10)
@@ -176,11 +176,22 @@ class FinanceTracker:
         except:
             self.error_label=tk.Label(self.visualize_frame,text="NOT ENOUGH RECORD TO VISUALIZE",bg='teal',font=('Arial',12))
             self.error_label.pack()
-            print()
-
+        
+        self.next_button=tk.Button(self.visualize_frame,text="Next",command=self.get_bar_graph)
+        self.next_button.pack(padx=10,pady=10)
         self.back_button=tk.Button(self.visualize_frame,text="Go Back",command=self.get_dashboard)
         self.back_button.pack(padx=10,pady=10)
         
+    def get_bar_graph(self):
+        for children in self.visualize_frame.winfo_children():
+            children.destroy()
+        sql=f"SELECT SUM(amount),TO_CHAR(expense_date, 'Month') AS expense_month FROM expenses WHERE expense_date >= CURRENT_DATE - INTERVAL '5 months' GROUP BY expense_month ORDER BY expense_month DESC"
+        self.cursor.execute(sql)
+        result=self.cursor.fetchall()
+        print(result)
+        self.back_button=tk.Button(self.visualize_frame,text="Go Back",command=self.get_dashboard)
+        self.back_button.pack(padx=10,pady=10)
+
 def main():
     root=tk.Tk()
     finance_tracker=FinanceTracker(root)
