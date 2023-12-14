@@ -50,7 +50,7 @@ class FinanceTracker:
         self.dashboard_frame=tk.Frame(self.root,bg='teal')
         self.dashboard_frame.pack(fill='both',expand=1)
         #list of categories
-        self.categories=['Food','Rent','Education','Travel','Miscellneous','Taxes','Health and Medicine']
+        self.categories=['food','rent','education','travel','miscellaneous','taxes','health and medicine']
         #label for category
         self.select_category=tk.Label(self.dashboard_frame,text='Select a category:',bg='teal',fg='yellow',font=('Arial',12))
         self.select_category.pack(padx=10,pady=10)
@@ -163,17 +163,20 @@ class FinanceTracker:
                 #self.category_expenses.append(0)
         
         try:
+          if len(self.category_expenses)==0:
+            raise ValueError
           plt.pie(self.category_expenses,labels=None, autopct='%1.1f%%',startangle=90)
+          plt.title("Pie-chart for this month")
           plt.legend(self.category_labels, loc='right', bbox_to_anchor=(1.35, 0.05))
           plt.savefig("my_pie_chart.png")
           plt.close()
-          self.image_label=tk.Label(self.visualize_frame,text="Pie-Chart for this month",bg='teal',fg='yellow',font=("Arial",12))
-          self.image_label.pack(padx=10,pady=10)
+          #self.image_label=tk.Label(self.visualize_frame,text="Pie-Chart for this month",bg='teal',fg='yellow',font=("Arial",12))
+          #self.image_label.pack(padx=10,pady=10)
           self.my_image=ImageTk.PhotoImage(Image.open('my_pie_chart.png'))
           self.image_label=tk.Label(self.visualize_frame,image=self.my_image)
           self.image_label.pack(padx=10,pady=10)
 
-        except:
+        except ValueError:
             self.error_label=tk.Label(self.visualize_frame,text="NOT ENOUGH RECORD TO VISUALIZE",bg='teal',font=('Arial',12))
             self.error_label.pack()
         
@@ -185,10 +188,26 @@ class FinanceTracker:
     def get_bar_graph(self):
         for children in self.visualize_frame.winfo_children():
             children.destroy()
-        sql=f"SELECT SUM(amount),TO_CHAR(expense_date, 'Month') AS expense_month FROM expenses WHERE expense_date >= CURRENT_DATE - INTERVAL '5 months' GROUP BY expense_month ORDER BY expense_month DESC"
+        sql=f"SELECT SUM(amount),TO_CHAR(expense_date, 'Month') AS expense_month FROM expenses WHERE expense_date >= CURRENT_DATE - INTERVAL '11 months'  GROUP BY expense_month ORDER BY MIN(expense_date) ASC"
         self.cursor.execute(sql)
         result=self.cursor.fetchall()
-        print(result)
+        amount=[]
+        months=[]
+        for item in result:
+            amount.append(item[0])
+            months.append((item[1])[0:3])
+        plt.figure(figsize=(8, 6)) 
+        plt.bar(months, amount, color='red')
+        plt.title("This year's expenses")
+        plt.xlabel("Months")
+        plt.ylabel("Expenses")
+        plt.tight_layout()
+        plt.savefig("bar_graph.png")
+        plt.close()
+        self.bar_image=ImageTk.PhotoImage(Image.open('bar_graph.png'))
+        self.bar_label=tk.Label(self.visualize_frame,image=self.bar_image)
+        self.bar_label.pack(padx=10,pady=10)
+
         self.back_button=tk.Button(self.visualize_frame,text="Go Back",command=self.get_dashboard)
         self.back_button.pack(padx=10,pady=10)
 
