@@ -6,9 +6,11 @@ from matplotlib import pyplot as plt
 from PIL import ImageTk,Image
 from tkcalendar import DateEntry
 from datetime import datetime
+import re
 
 class FinanceTracker:
     def __init__(self,root):
+
         #initialize the window
         self.root=root
         self.root.title('Finance Tracker')
@@ -37,12 +39,18 @@ class FinanceTracker:
         self.welcome_label.place(relx=0.5, rely=0.45, anchor=tk.CENTER)  # Position at the center
 
         # create a new record button
-        self.button = tk.Button(self.start_frame, text='New record',  bg='sky blue', fg='black', font=('arial', 14), relief=tk.RAISED,command=self.get_dashboard)
-        self.button.place(relx=0.5, rely=0.5, anchor=tk.CENTER)  # Position at the center
+        self.button = tk.Button(self.start_frame, text='New record',  bg='teal', fg='black', font=('arial', 14), relief=tk.RAISED,borderwidth=3,command=self.get_dashboard)
+        self.button.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+
+        #initializing frames
         self.dashboard_frame=tk.Frame(self.root)
         self.visualize_frame=tk.Frame(self.root)
+
+        #error label
+        self.error=tk.Label()
     
     def get_dashboard(self):
+
         #Destroy an existing start frame
         self.start_frame.destroy()
         self.visualize_frame.destroy()
@@ -78,55 +86,71 @@ class FinanceTracker:
         self.date_entry.pack(pady=10,padx=10)
         
         #button to add expense
-        self.add_expense_button=tk.Button(self.dashboard_frame,text="Add",bg='sky blue',fg='Yellow',command=self.add_expense)
+        self.add_expense_button=tk.Button(self.dashboard_frame,text="Add",bg='teal',fg='Yellow',borderwidth=3,command=self.add_expense)
         self.add_expense_button.place(relx=0.3,rely=0.53, anchor=tk.CENTER)
     
         #button to visualize
-        self.visualize_button=tk.Button(self.dashboard_frame,text="Visualize",bg='sky blue',fg='Yellow',command=self.visualize)
+        self.visualize_button=tk.Button(self.dashboard_frame,text="Visualize",bg='teal',fg='Yellow',borderwidth=3,command=self.visualize)
         self.visualize_button.place(relx=0.5,rely=0.53, anchor=tk.CENTER)
 
         #buttton to exit
-        self.exit_button=tk.Button(self.dashboard_frame,text="Exit",bg='sky blue',fg='Yellow',command=self.exit_app)
+        self.exit_button=tk.Button(self.dashboard_frame,text="Exit",bg='teal',fg='Yellow',borderwidth=3,command=self.exit_app)
         self.exit_button.place(relx=0.7,rely=0.53, anchor=tk.CENTER)
-
+        
+        self.total_expense=tk.Label(self.dashboard_frame)
         self.show_recent_expenses()
+        self.month_total()
 
     def add_expense(self):
-        #get the inputs
-        category=self.category.get()
-        amount=self.amount_entry.get()
-        date=self.date_entry.get()
-        remarks=self.remarks.get()
-        
-        #sql command
-        sql="INSERT INTO expenses (amount, category, expense_date,remarks) VALUES (%s, %s, %s,%s)"
-        data=(amount,category,date,remarks)
+        try:
+         #get the inputs
+          self.error.destroy()
+          category=self.category.get()
+          amount=self.amount_entry.get()
+          date=self.date_entry.get()
+          remarks=self.remarks.get()
 
-        #insert into database
-        self.cursor.execute(sql,data)
-        self.database.commit()
+          if matches:=re.match(r"^(\d+)$",amount) and re.match(r'^\w+$',remarks):
+            pass
+          else:
+            raise ValueError
         
-        #clear the amount field
-        self.amount_entry.delete(0, tk.END)
-        self.show_recent_expenses()
+          #sql command
+          sql="INSERT INTO expenses (amount, category, expense_date,remarks) VALUES (%s, %s, %s,%s)"
+          data=(amount,category,date,remarks)
+
+           #insert into database
+          self.cursor.execute(sql,data)
+          self.database.commit()
+        
+           #clear the amount field
+          self.amount_entry.delete(0, tk.END)
+          self.show_recent_expenses()
+          self.month_total()
+
+        except ValueError:
+           print("INVALID")
+           self.error=tk.Label(self.dashboard_frame,text="Error in entry.Please re-check!!",bg='teal',fg='#ff7f7f')
+           self.error.pack()
 
     def show_recent_expenses(self):
+
         sql="SELECT * FROM expenses WHERE expense_date=CURRENT_DATE"
         self.cursor.execute(sql)
         self.today_expenses=self.cursor.fetchall()
         if len(self.today_expenses)!=0:
-            self.list_label=tk.Label(self.dashboard_frame,text="Today's Expenses:",bg='teal',fg='yellow')
+            self.list_label=tk.Label(self.dashboard_frame,text="Today's Expenses:",bg='teal',fg='yellow',font=('Arial',14))
             self.list_label.place(relx=0.15,rely=0.6)
             self.expenses_listbox=tk.Listbox(self.dashboard_frame,width=60,height=5)
             self.expenses_listbox.place(relx=0.2,rely=0.65)
             for expense in self.today_expenses:
-              expense_info = f"Amount: {expense[1]}, Category: {expense[2]}, Remarks: {expense[4]}"
-              frame = tk.Frame(self.expenses_listbox)
+              expense_info = f"Amount: {expense[1]}, Remarks: {expense[4]}"
+              frame = tk.Frame(self.expenses_listbox,bg='teal',borderwidth=3)
               frame.pack(fill='x')
-              label = tk.Label(frame, text=expense_info)
+              label = tk.Label(frame, text=expense_info,bg='teal',font=("Arial",12))
               label.pack(side='left')
-              undo_button = tk.Button(frame, text="Undo",command=lambda: self.delete_expenses(expense[0]))
-              undo_button.pack(side='right')
+              undo_button = tk.Button(frame, text="Undo",bg='teal',fg='orange',borderwidth=3,command=lambda: self.delete_expenses(expense[0]))
+              undo_button.pack(side='right',ipadx=50)
 
     def delete_expenses(self,id):
         self.dashboard_frame.destroy()
@@ -142,6 +166,7 @@ class FinanceTracker:
         self.root.quit()
 
     def visualize(self):
+
         #destroy the dashboard frame
         self.dashboard_frame.destroy()
         self.visualize_frame=tk.Frame(self.root,bg='teal')
@@ -180,12 +205,13 @@ class FinanceTracker:
             self.error_label=tk.Label(self.visualize_frame,text="NOT ENOUGH RECORD TO VISUALIZE",bg='teal',font=('Arial',12))
             self.error_label.pack()
         
-        self.next_button=tk.Button(self.visualize_frame,text="Next",command=self.get_bar_graph)
-        self.next_button.pack(padx=10,pady=10)
-        self.back_button=tk.Button(self.visualize_frame,text="Go Back",command=self.get_dashboard)
+        self.next_button=tk.Button(self.visualize_frame,text="Next",bg='teal',fg='yellow',borderwidth=3,command=self.get_bar_graph)
+        self.next_button.pack(padx=10,pady=10,ipadx=12)
+        self.back_button=tk.Button(self.visualize_frame,text="Go Back",bg='teal',fg='yellow',borderwidth=3,command=self.get_dashboard)
         self.back_button.pack(padx=10,pady=10)
         
     def get_bar_graph(self):
+
         for children in self.visualize_frame.winfo_children():
             children.destroy()
         sql=f"SELECT SUM(amount),TO_CHAR(expense_date, 'Month') AS expense_month FROM expenses WHERE expense_date >= CURRENT_DATE - INTERVAL '11 months'  GROUP BY expense_month ORDER BY MIN(expense_date) ASC"
@@ -196,21 +222,36 @@ class FinanceTracker:
         for item in result:
             amount.append(item[0])
             months.append((item[1])[0:3])
-        plt.figure(figsize=(8, 6)) 
-        plt.bar(months, amount, color='red')
-        plt.title("This year's expenses")
-        plt.xlabel("Months")
-        plt.ylabel("Expenses")
-        plt.tight_layout()
-        plt.savefig("bar_graph.png")
-        plt.close()
-        self.bar_image=ImageTk.PhotoImage(Image.open('bar_graph.png'))
-        self.bar_label=tk.Label(self.visualize_frame,image=self.bar_image)
-        self.bar_label.pack(padx=10,pady=10)
+        try:
+            if len(amount)==0:
+                raise ValueError
+            plt.figure(figsize=(8, 6)) 
+            plt.bar(months, amount, color='skyblue',width=0.5)
+            plt.title("This year's expenses")
+            plt.xlabel("Months")
+            plt.ylabel("Expenses")
+            plt.tight_layout()
+            plt.savefig("bar_graph.png")
+            plt.close()
+            self.bar_image=ImageTk.PhotoImage(Image.open('bar_graph.png'))
+            self.bar_label=tk.Label(self.visualize_frame,image=self.bar_image)
+            self.bar_label.pack(padx=10,pady=10)
+        except ValueError as e:
+            self.error_label=tk.Label(self.visualize_frame,text="NOT ENOUGH RECORD TO VISUALIZE",bg='teal',font=('Arial',12))
+            self.error_label.pack()
+            print(e)
 
-        self.back_button=tk.Button(self.visualize_frame,text="Go Back",command=self.get_dashboard)
+        self.back_button=tk.Button(self.visualize_frame,text="Go Back", fg='yellow',bg='teal',borderwidth=3,command=self.get_dashboard)
         self.back_button.pack(padx=10,pady=10)
 
+    def month_total(self):
+        sql=f'SELECT SUM(amount) FROM expenses WHERE  EXTRACT(MONTH FROM expense_date)={datetime.now().month}'
+        self.cursor.execute(sql)
+        result=self.cursor.fetchone()[0]
+        if result is not None:
+            self.total_expense.config(text=f'Total expense this month: {result}',bg='teal',fg='orange',font=('Arial',12))
+            self.total_expense.place(relx=0.30,rely=0.57)
+        
 def main():
     root=tk.Tk()
     finance_tracker=FinanceTracker(root)
