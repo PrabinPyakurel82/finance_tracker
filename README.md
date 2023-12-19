@@ -54,12 +54,10 @@ This application allows you to keep record of your expenses and visualize your e
   - Create a Database: Run the following SQL command to create a new database (replace <database_name> with your desired name):
     - open psql shell:
     ```bash
-    psql -U <usernamne> 
-      ```
+    psql -U <usernamne>  ```
 
-    - ```sql
-   CREATE DATABASE <database_name>
-   ```
+    ```sql
+   CREATE DATABASE <database_name>```
 
     
 
