@@ -56,9 +56,9 @@ This application allows you to keep record of your expenses and visualize your e
     ```bash
     psql -U <usernamne>
     ```
-   - Create a database
+    - Create a database
     ```sql
-   CREATE DATABASE <database_name>```
+   CREATE DATABASE <database_name>;```
 
     
 
