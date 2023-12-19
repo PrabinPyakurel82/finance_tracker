@@ -1,0 +1,61 @@
+get record of user's expenses
+create a database if not exists
+connect to database
+save the expenses to database
+get the monthly record of user's expenses
+visualize the user's expenses according to category
+
+
+
+connect when obj is created (__init__)
+create a GUI (__init__)
+expenses add (add_expense)
+
+
+
+functionality
+constructor:
+    create a gui window
+    connect to database
+
+add_expenses:
+    select a category
+    add amount
+    expense_date selection
+    
+
+calculate budget
+    calculate expense acc to category monthly
+    compare with previous month's expense
+    lowest and highest expense till now
+
+visualize_expenses:
+    create a piechat for per month
+    5 months expenses in bar graph
+
+database fields
+  id(mandatory)
+  expense amount
+  category
+  expense_date
+
+
+
+
+#visualizing 
+ - get the current month from data
+ - get the expenses for each category for this month
+ - add the expense for each category
+ - visualize the info into pie-chart
+
+#todo tomorrow
+ - add a feature to show the recent expense (done)
+ - add a new column in table as remarks in database (done)
+ - bar graph  for 5 recent months
+ - to  be continued....
+
+#todo
+   -regex in amount (done)
+   -future date not allowed (done)
+   -cant leave any entry field empty (done)
+   
