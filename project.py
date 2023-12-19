@@ -6,6 +6,7 @@ from matplotlib import pyplot
 from datetime import datetime
 from PIL import ImageTk, Image
 import re
+import set_database
 
 class FinanceTracker:
     def __init__(self):
@@ -159,7 +160,7 @@ class FinanceTrackerGUI(FinanceTracker):
         self.root.title('Finance Tracker')
         self.root.geometry('800x800')
         super().__init__()
-        self.connect_database('cs50_final_project','postgres','9860934500','localhost')
+        self.connect_database(set_database.name,set_database.user,set_database.password,set_database.host)
         self.create_gui()
 
     def create_gui(self):
