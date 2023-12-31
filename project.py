@@ -158,7 +158,7 @@ class FinanceTrackerGUI(FinanceTracker):
     def __init__(self,root):
         self.root = root
         self.root.title('Finance Tracker')
-        self.root.geometry('800x800')
+        self.root.geometry('900x900')
         super().__init__()
         self.connect_database(set_database.name,set_database.user,set_database.password,set_database.host)
         self.create_gui()
@@ -228,7 +228,7 @@ class FinanceTrackerGUI(FinanceTracker):
         self.exit_button.place(relx=.7,rely=.54,anchor="center")
 
         if self.get_monthly_total(datetime.now().month) is not None:
-            self.total_month_expenses=Label(self.dashboard_frame,text=f"This Month Expenses: RS {self.get_monthly_total(datetime.now().month)}",bg="teal",fg="orange")
+            self.total_month_expenses=Label(self.dashboard_frame,text=f"This Month Expenses: RS {self.get_monthly_total(datetime.now().month)}",bg="teal",fg="orange",font=("Arial",14))
             self.total_month_expenses.place(relx=.36,rely=.57)
         
         
@@ -260,11 +260,11 @@ class FinanceTrackerGUI(FinanceTracker):
                 self.dashboard_frame.destroy()
                 self.get_dashboard()
             else:
-                self.error_label = Label(self.dashboard_frame,text=status,bg="teal",fg="#ff7f7f")
+                self.error_label = Label(self.dashboard_frame,text=status,bg="teal",fg="#ff7f7f",font=("Arial",12))
                 self.error_label.pack()
 
         except ValueError as e:
-            self.error_label = Label(self.dashboard_frame,text=e,bg="teal",fg="#ff7f7f")
+            self.error_label = Label(self.dashboard_frame,text=e,bg="teal",fg="#ff7f7f",font=("Arial",12))
             self.error_label.pack()
 
     def delete_now(self,id,date):

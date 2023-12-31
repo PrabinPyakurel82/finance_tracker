@@ -1,4 +1,5 @@
 # Finance Tracker
+#### Video Demo: https://youtu.be/01JnMVTSHQM
 This is a simple finance tracker app using Python's Tkinter library for graphical user interface and Postgresql for storing the expenses.
 
 ## Table of Contents

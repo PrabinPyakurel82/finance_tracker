@@ -4,7 +4,6 @@ from datetime import datetime,timedelta
 
 expense=FinanceTracker()
 expense.connect_database('test_db','postgres','9860934500','localhost')
-#expense.add_expense('100','food','2023-12-18','rara')
 def test_add_expense():
         expense.connect_database('test_db','postgres','9860934500','localhost')
         assert expense.add_expense('100','food',str(datetime.now().date()),'rara') == 'ADDED SUCCESSFULLY'
