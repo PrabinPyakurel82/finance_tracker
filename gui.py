@@ -22,29 +22,29 @@ class FinanceTrackerGUI(FinanceTracker):
 
     def create_gui(self):
          #initializing frames
-        self.welcome_frame = Frame(self.root,bg="teal")
+        self.welcome_frame = Frame(self.root,bg="#2C3E50")
         self.welcome_frame.pack(fill="both",expand=1)
         self.dashboard_frame=Frame()
         self.visualize_frame=Frame()
         self.error_label=Label()
 
         #welcome label
-        self.welcome_label = Label(self.welcome_frame,text="Welcome ",font=("arial",20),fg="yellow",bg="teal")
+        self.welcome_label = Label(self.welcome_frame,text="Welcome ",font=("arial",20),fg="#ECF0F1",bg="#2C3E50")
         self.welcome_label.place(relx=0.505, rely=0.45, anchor='center')
 
         #button
-        self.start_button = Button(self.welcome_frame,text="NEW RECORD",bg="teal",fg="yellow",borderwidth=3,command=self.get_dashboard)
+        self.start_button = Button(self.welcome_frame,text="NEW RECORD",bg="#2C3E50",fg="#ECF0F1",borderwidth=3,command=self.get_dashboard)
         self.start_button.place(relx=.5,rely=.5,anchor='center')
 
     def get_dashboard(self):
         self.welcome_frame.destroy()
         self.visualize_frame.destroy()
         #create new frame for dashboard
-        self.dashboard_frame = Frame(self.root,bg="teal")
+        self.dashboard_frame = Frame(self.root,bg="#2C3E50")
         self.dashboard_frame.pack(expand=1,fil="both")
         
         #label to select category
-        self.select_category_label = Label(self.dashboard_frame,text="Select a category",bg="teal",fg="yellow",font=("arial",12))
+        self.select_category_label = Label(self.dashboard_frame,text="Select a category",bg="#2C3E50",fg="#ECF0F1",font=("arial",12))
         self.select_category_label.pack(padx=10,pady=10)
         #drop box for category selection
         self.category_options = ["food","education","miscellaneous","travel","rent","taxes","health and medicine"]
@@ -53,39 +53,39 @@ class FinanceTrackerGUI(FinanceTracker):
         self.category.pack(padx=10,pady=10)
         
         #entry label
-        self.remarks_label = Label(self.dashboard_frame,text="Remarks",bg="teal",fg="yellow",font=("arial",12))
+        self.remarks_label = Label(self.dashboard_frame,text="Remarks",bg="#2C3E50",fg="#ECF0F1",font=("arial",12))
         self.remarks_label.pack(padx=10,pady=10)
         #Entry for amount
         self.remarks_entry = Entry(self.dashboard_frame,width=25)
         self.remarks_entry.pack(padx=10,pady=10)
 
         #entry label
-        self.amount_label = Label(self.dashboard_frame,text="Amount",bg="teal",fg="yellow",font=("arial",12))
+        self.amount_label = Label(self.dashboard_frame,text="Amount",bg="#2C3E50",fg="#ECF0F1",font=("arial",12))
         self.amount_label.pack(padx=10,pady=10)
         #Entry for amount
         self.amount_entry = Entry(self.dashboard_frame,width=25)
         self.amount_entry.pack(padx=10,pady=10)
         
         #date label
-        self.date_label = Label(self.dashboard_frame,text="Select Date",bg="teal",font=("arial",12),fg="yellow")
+        self.date_label = Label(self.dashboard_frame,text="Select Date",bg="#2C3E50",font=("arial",12),fg="#ECF0F1")
         self.date_label.pack(padx=10,pady=10)
-        self.date_entry = DateEntry(self.dashboard_frame,width=24,date_pattern = "yyyy-mm-dd", background='darkblue', foreground='white', borderwidth=2)
+        self.date_entry = DateEntry(self.dashboard_frame,width=24,date_pattern = "yyyy-mm-dd", background='#2980B9', foreground='#ECF0F1', borderwidth=2)
         self.date_entry.pack(padx=10,pady=10)
 
         #button 
         #to add expenses
-        self.add_expense_button = Button(self.dashboard_frame,text="ADD",bg="teal",fg="yellow",borderwidth=3,command=self.add_now)
+        self.add_expense_button = Button(self.dashboard_frame,text="ADD",bg="#2C3E50",fg="#ECF0F1",borderwidth=3,command=self.add_now)
         self.add_expense_button.place(relx=.3,rely=.54,anchor="center")
 
         #to visualize
-        self.visualize_expenses_button = Button(self.dashboard_frame,text="VISUALIZE EXPENSES",bg="teal",fg="yellow",borderwidth=3,command=self.visualize_this_month)
+        self.visualize_expenses_button = Button(self.dashboard_frame,text="VISUALIZE EXPENSES",bg="#2C3E50",fg="#ECF0F1",borderwidth=3,command=self.visualize_this_month)
         self.visualize_expenses_button.place(relx=.5,rely=.54,anchor="center")
 
-        self.exit_button = Button(self.dashboard_frame,text="EXIT",bg="teal",fg="yellow",borderwidth=3,command=self.exit_app)
+        self.exit_button = Button(self.dashboard_frame,text="EXIT",bg="#2C3E50",fg="#ECF0F1",borderwidth=3,command=self.exit_app)
         self.exit_button.place(relx=.7,rely=.54,anchor="center")
 
         if self.get_monthly_total(datetime.now().month) is not None:
-            self.total_month_expenses=Label(self.dashboard_frame,text=f"This Month Expenses: RS {self.get_monthly_total(datetime.now().month)}",bg="teal",fg="orange",font=("Arial",14))
+            self.total_month_expenses=Label(self.dashboard_frame,text=f"This Month Expenses: RS {self.get_monthly_total(datetime.now().month)}",bg="#2C3E50",fg="#F39C12",font=("Arial",14))
             self.total_month_expenses.place(relx=.36,rely=.57)
         
         
@@ -96,13 +96,13 @@ class FinanceTrackerGUI(FinanceTracker):
             today_list.place(relx=0.2,rely=0.65)
             for expense in today_expenses:
                 #self.recent_expenses_list.insert(END,f"Particular: {expenses[4]}    Amount: Rs {expenses[1]}")
-                frame = Frame(today_list,bg="teal",borderwidth=3)
+                frame = Frame(today_list,bg="#2C3E50",borderwidth=3)
                 frame.pack(fill="x")
 
-                label = Label(frame,text=f"Category: {expense[2]}    Amount: Rs {expense[1]}  Remarks: {expense[4]}",bg="teal")  
+                label = Label(frame,text=f"Category: {expense[2]}    Amount: Rs {expense[1]}  Remarks: {expense[4]}",bg="#2C3E50",fg="#ECF0F1")  
                 label.pack(side="left",ipadx=20)
 
-                button = Button(frame,text="UNDO",command=lambda id = expense[0], date = expense[3]:self.delete_now(id,date),fg="orange",bg="teal",borderwidth=3)
+                button = Button(frame,text="UNDO",command=lambda id = expense[0], date = expense[3]:self.delete_now(id,date),fg="#F39C12",bg="#2C3E50",borderwidth=3)
                 button.pack(side="right",ipadx=50) 
 
     def add_now(self):
@@ -117,11 +117,11 @@ class FinanceTrackerGUI(FinanceTracker):
                 self.dashboard_frame.destroy()
                 self.get_dashboard()
             else:
-                self.error_label = Label(self.dashboard_frame,text=status,bg="teal",fg="#ff7f7f",font=("Arial",12))
+                self.error_label = Label(self.dashboard_frame,text=status,bg="#2C3E50",fg="#FF6347",font=("Arial",12))
                 self.error_label.pack()
 
         except ValueError as e:
-            self.error_label = Label(self.dashboard_frame,text=e,bg="teal",fg="#ff7f7f",font=("Arial",12))
+            self.error_label = Label(self.dashboard_frame,text=e,bg="#2C3E50",fg="#FF6347",font=("Arial",12))
             self.error_label.pack()
 
     def delete_now(self,id,date):
@@ -134,7 +134,7 @@ class FinanceTrackerGUI(FinanceTracker):
         self.dashboard_frame.destroy()
 
         #visualize frame
-        self.visualize_frame = Frame(self.root,bg='teal')
+        self.visualize_frame = Frame(self.root,bg='#2C3E50')
         self.visualize_frame.pack(expand=1,fill='both')
         
         #create a pie chart
@@ -144,15 +144,15 @@ class FinanceTrackerGUI(FinanceTracker):
             self.pie_image_label.pack(padx=10,pady=10)
         
         else:
-            self.visualize_error_label = Label(self.visualize_frame,text="NO ENOUGH RECORD TO VISUALIZE",font=("arial",14),bg="teal",fg="yellow")
+            self.visualize_error_label = Label(self.visualize_frame,text="NO ENOUGH RECORD TO VISUALIZE",font=("arial",14),bg="#2C3E50",fg="#ECF0F1")
             self.visualize_error_label.pack(padx=10,pady=10)
 
         #NEXT BUTTON FOR BARGRAPH VISUALIZATION
-        self.next_button = Button(self.visualize_frame,text="NEXT",bg="teal",fg="yellow",borderwidth=3,command=self.visualize_this_year)
+        self.next_button = Button(self.visualize_frame,text="NEXT",bg="#2C3E50",fg="#ECF0F1",borderwidth=3,command=self.visualize_this_year)
         self.next_button.pack(padx=10,pady=10,ipadx=12)
 
         #button to go back 
-        self.go_back_button = Button(self.visualize_frame,text="GO BACK",bg="teal",fg="yellow",borderwidth=3,command=self.get_dashboard)
+        self.go_back_button = Button(self.visualize_frame,text="GO BACK",bg="#2C3E50",fg="#ECF0F1",borderwidth=3,command=self.get_dashboard)
         self.go_back_button.pack(padx=10,pady=10)
     
     def visualize_this_year(self):
@@ -165,15 +165,12 @@ class FinanceTrackerGUI(FinanceTracker):
             self.bargraph_image_label.pack(padx=10,pady=10)
         
         else:
-            self.visualize_error_label = Label(self.visualize_frame,text="NO ENOUGH RECORD TO VISUALIZE",font=("arial",14),bg="teal",fg="yellow")
+            self.visualize_error_label = Label(self.visualize_frame,text="NO ENOUGH RECORD TO VISUALIZE",font=("arial",14),bg="#2C3E50",fg="#ECF0F1")
             self.visualize_error_label.pack(padx=10,pady=10)
 
-        self.go_back_button = Button(self.visualize_frame,text="GO BACK",bg="teal",fg="yellow",borderwidth=3,command=self.get_dashboard)
+        self.go_back_button = Button(self.visualize_frame,text="GO BACK",bg="#2C3E50",fg="#ECF0F1",borderwidth=3,command=self.get_dashboard)
         self.go_back_button.pack(padx=10,pady=10)
     
     def exit_app(self):
         self.close_database()
         self.root.destroy()
-
-
-
