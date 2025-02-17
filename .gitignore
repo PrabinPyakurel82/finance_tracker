@@ -1,4 +1,3 @@
-*.png
 __pycache__/
 .pytest_cache/
 todo.txt
